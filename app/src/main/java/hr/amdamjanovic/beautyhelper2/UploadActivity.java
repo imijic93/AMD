@@ -100,14 +100,16 @@ public class UploadActivity extends AppCompatActivity {
     {
         if (mImageUri != null)
         {
+            final StorageReference fileReference = mStorageRef.child(System.currentTimeMillis()
+                    + "." + getFileExtension(mImageUri));
 
-            mStorageRef.putFile(mImageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>()
+            mUploadTask = fileReference.putFile(mImageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>()
             {
                 @Override
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot)
                 {
 
-                    mStorageRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>()
+                    fileReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>()
                     {
                         @Override
                         public void onSuccess(Uri uri)

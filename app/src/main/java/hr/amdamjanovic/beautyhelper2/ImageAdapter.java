@@ -2,24 +2,32 @@ package hr.amdamjanovic.beautyhelper2;
 
 import android.content.Context;
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 import com.squareup.picasso.Picasso;
+
+import java.util.ArrayList;
 import java.util.List;
 
-public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHolder> {
+public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHolder> implements Filterable {
     private Context mContext;
     private List<Upload> mUploads;
+    private List<Upload> mUploadsFull;
     private OnItemClickListener mListener;
     public ImageAdapter(Context context, List<Upload> uploads) {
         mContext = context;
-        mUploads = uploads;
+        this.mUploads = uploads;
+        mUploadsFull = new ArrayList<>(uploads);
     }
     @Override
     public ImageViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -95,4 +103,38 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
     public void setOnItemClickListener(OnItemClickListener listener) {
         mListener = listener;
     }
+
+    @Override
+    public Filter getFilter() {
+        return nameFilter;
+    }
+
+    private Filter nameFilter = new Filter() {
+        @Override
+        protected FilterResults performFiltering(CharSequence constraint) {
+            List<Upload> filteredList = new ArrayList<>();
+            if (constraint == null || constraint.length() == 0) {
+                filteredList.addAll(mUploadsFull);
+                Log.d("TKOSITIIII", "AAAAA");
+            } else {
+                String filterPattern = constraint.toString().toLowerCase().trim();
+                for (Upload item : mUploadsFull) {
+                    Log.d("TKOSITIIII", mUploadsFull.toString());
+                    if (item.getName().toLowerCase().contains(filterPattern)) {
+                        filteredList.add(item);
+                    }
+                }
+            }
+            FilterResults results = new FilterResults();
+            results.values = filteredList;
+            return results;
+        }
+        @Override
+        protected void publishResults(CharSequence constraint, FilterResults results) {
+            mUploads.clear();
+            mUploads.addAll((List) results.values);
+            notifyDataSetChanged();
+        }
+    };
+
 }
